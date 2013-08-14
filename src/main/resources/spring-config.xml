@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:cache="http://www.springframework.org/schema/cache"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+
+    <jpa:repositories base-package="com.mati.spring.springdataexample"
+                      entity-manager-factory-ref="entityManagerFactory"
+                      factory-class="org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean"
+                      transaction-manager-ref="transactionManager"/>
+
+    <bean id="dataSource"
+          class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
+        <property name="url" value="jdbc:hsqldb:file:DataBase/;shutdown=true;hsqldb.write_delay=false;"/>
+        <property name="username" value="SA"/>
+        <property name="password" value=""/>
+        <property name="maxActive" value="1"/>
+        <property name="initialSize" value="1"/>
+    </bean>
+
+    <bean id="MyDAO"
+          class="com.mati.spring.springdataexample.HelloJDBCDao">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="MyDAO2"
+          class="com.mati.spring.springdataexample.HelloSpringJPADAO">
+    </bean>
+
+    <bean id="jpaVendor"
+          class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="database" value="HSQL"/>
+        <property name="databasePlatform" value="org.hibernate.dialect.HSQLDialect"/>
+        <property name="generateDdl" value="false"/>
+    </bean>
+
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="jpaVendorAdapter" ref="jpaVendor"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="persistenceUnitName" value="Humans"/>
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <context:annotation-config/>
+    <context:component-scan base-package="com.mati.spring.springdataexample"/>
+
+
+</beans>
